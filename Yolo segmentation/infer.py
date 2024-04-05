@@ -1,6 +1,6 @@
 from ultralytics import YOLO
 import cv2
-from PIL import Image
+import numpy as np
 
 
 # Load a model
@@ -16,11 +16,30 @@ while True :
         break
     
     results = model(frame)[0]
-    for r in results:
-        print(r.masks)
-        break
+    text = ""
+    masks_points = []
 
-    annotated_img = results[0].plot()
+    annotated_img = frame
+    for r in results:
+        if(int(r.boxes.cls.item()) == 0):
+            text = f"{text} \n----------- {r.boxes.cls.item()} -----------\n"
+            text = text + str(r.masks) + "\n"
+            masks_points = r.masks.xy
+            annotated_img = r.plot(boxes = False, labels = False)
+            break
+
+    # with open("masks.txt", "w")as file:
+    #     file.write(text)
+        
+    # annotated_img = frame
+    # if(len(masks_points) != 0):
+    #     masks_points.append(masks_points[0])
+    #     masks_points = np.array(masks_points, np.int32)
+    #     masks_points = masks_points.reshape((-1, 1, 2))
+    #     print(type(masks_points))
+    #     annotated_img = cv2.fillPoly(frame,masks_points,color=(0,0,255))
+
+    
     cv2.imshow("Segmentation", annotated_img)
 
     # Check if the user pressed the 'q' key

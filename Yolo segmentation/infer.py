@@ -1,42 +1,87 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
-from PIL import Image
+import torch
 
 
 # Load a model
 model = YOLO('yolov8n-seg.pt')  # load an official model
 
-cap = cv2.VideoCapture(0)
 
+def masks_list():
+   print("TO_DO")
 
-while True :
-    ret, frame = cap.read()
+def process(results, frame):
+    device = torch.device('cuda:0')
 
-    if not ret :
-        break
+    input_tensor = torch.from_numpy(frame)
+    input_tensor = input_tensor.to(device)
+
+    mask_img = np.zeros(shape=(384, 640))
+
+    mask_tensor = torch.from_numpy(mask_img)
+    mask_tensor = mask_tensor.to(device=device)
+
+    annotated_img = results.plot(boxes=False, labels = False)
+
+    foreground_img =  np.zeros(shape=(384, 640, 3), dtype=np.uint8)
+    foreground_img = foreground_img.reshape((384,640,3))
+    foreground_tensor = torch.from_numpy(foreground_img)
+    foreground_tensor = foreground_tensor.to(device)
     
-    results = model(frame)[0]
-    text = ""
-    masks_points = []
-
-    annotated_img = frame
-    mask_img = frame
     for r in results:
-        if(int(r.boxes.cls.item()) == 0):
-            text = f"{text} \n----------- {r.boxes.cls.item()} -----------\n"
-            text = text + str(r.masks) + "\n"
-            masks_points = r.masks.xy
-            annotated_img = r.plot(boxes = False, labels = False)
-            
-            mask_img = r.masks.data[0].cpu().numpy()
-            break
+        mask_tensor = torch.logical_or(torch.eq(r.masks.data[0], 1), torch.eq(mask_tensor,1)).to(torch.float32)
     
-    cv2.imshow("Mask", mask_img)    
-    cv2.imshow("Segmentation", annotated_img)
+    mask_img = mask_tensor.cpu().numpy()
 
-    # Check if the user pressed the 'q' key
-    if cv2.waitKey(1) == ord('q'):
-        break
+    # with open("foreground.txt" , "w") as file :
+    #     file.write(str(foreground_tensor))
+    #     file.write(f"\n\n ---- {foreground_tensor.shape} ---- \n\n")
+
+    # with open("input_tensor.txt", "w") as file :
+    #     file.write(str(input_tensor))
+    #     file.write(f"\n\n ---- {input_tensor.shape} ---- \n\n")
+
+    foreground_tensor[:,:,0] = torch.mul(torch.logical_not(torch.eq(mask_tensor,0)).to(torch.float32) , input_tensor[:,:,0])
+    foreground_tensor[:,:,1] = torch.mul(torch.logical_not(torch.eq(mask_tensor,0)).to(torch.float32) , input_tensor[:,:,1])
+    foreground_tensor[:,:,2] = torch.mul(torch.logical_not(torch.eq(mask_tensor,0)).to(torch.float32) , input_tensor[:,:,2])
+
+    foreground_img = foreground_tensor.cpu().numpy()
+
+    return mask_img, annotated_img, foreground_img
 
 
+if __name__ == "__main__":
+        
+    path = "C:/Users/TEJAS BIBEKAR/Downloads/2.mp4"
+    
+    cap = cv2.VideoCapture(0)
+
+    frame_width = int(cap.get(3)) 
+    frame_height = int(cap.get(4)) 
+    
+    size = (frame_width, frame_height) 
+
+    while True :
+        ret, frame = cap.read()
+
+        frame = cv2.resize(frame, (640, 384))
+
+        if not ret :
+            break
+        
+        results = model(frame)[0]
+
+        mask_img, annotated_img, foreground_img = process(results, frame)
+
+        cv2.imshow("Mask", mask_img)  
+        cv2.imshow("Foreground" , foreground_img)
+        cv2.imshow("Segmentation", annotated_img)
+
+        # Check if the user pressed the 'q' key
+        if cv2.waitKey(1) == ord('q'):
+            break
+
+
+    cap.release() 
+    cv2.destroyAllWindows() 

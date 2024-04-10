@@ -1,13 +1,14 @@
 from ultralytics import YOLO
 import cv2
 import numpy as np
+import math
 
 X_coord = 0
-Y_coord = 0
+Y_coord = 1
 
 class Points:
     def __init__(self, keypoints) -> None:
-        if(len(keypoints) != 7) : print("Missing some KeyPoint")
+        if(len(keypoints) != 5) : print("Missing some KeyPoint")
         # Keypoints given by YOLOv8 Pose model
         # Nose --> 0 index
         # Left Eye --> 1 , Right Eye --> 2
@@ -16,14 +17,13 @@ class Points:
         self.nose = keypoints[0]
         self.eye = { "l" : keypoints[1], "r" : keypoints[2] }
         self.ear = { "l" : keypoints[3], "r" : keypoints[4] }
-        self.shoulder = { "l" : keypoints[5], "r" : keypoints[6] }
+        # self.shoulder = { "l" : keypoints[5], "r" : keypoints[6] }
 
     def show_points(self):
         print(f"""
               Nose --> {self.nose},\n
               Eyes :-> Left {self.eye["l"]}, Right {self.eye["r"]}\n
-              Ears :-> Left {self.ear["l"]}, {self.ear["r"]}\n
-              Shoulders :-> Left {self.shoulder["l"]}, Right {self.shoulder["r"]}""")
+              Ears :-> Left {self.ear["l"]}, Right {self.ear['r']}\n""")
 
 
 def extract_points(img):
@@ -37,28 +37,47 @@ def extract_points(img):
     top = []
     for r in results:
         # Only Keypoints of Eyes, Ears, Nose, Shoulders 
-        top = np.array(r.keypoints.xy[0][0:7].cpu().numpy())
+        top = np.array(r.keypoints.xy[0][0:5].cpu().numpy())
         break
     
     arr = []
     print(len(top))
     for i in top:
         arr.append([int(i[0]), int(i[1])])
-        if(i[0] != 0 and i[1] != 0) :
-            cv2.circle(img, (int(i[0]), int(i[1])), radius=5, color=(0, 255, 0), thickness=-1)
-
+    
+    img = results[0].plot(boxes = False, labels = False, kpt_line = False)
     return [img , arr]
 
 
+def distance_between(p1, p2):
+    return int(math.sqrt((p1[X_coord]-p2[X_coord]) * (p1[X_coord]-p2[X_coord]) + (p1[Y_coord]-p2[Y_coord]) * (p1[Y_coord]-p2[Y_coord])))
+
+
 def extract_face(img, keypoints):
-    start_x = keypoints.shoulder["r"][X_coord]
-    end_x = keypoints.shoulder["l"][X_coord]
-
-    end_y = keypoints.shoulder["l"][Y_coord]
     nose_y = keypoints.nose[Y_coord]
+    nose_x = keypoints.nose[X_coord]
+    
+    eye_l_x = keypoints.eye["l"][X_coord]
+    eye_l_y = keypoints.eye["l"][Y_coord]
+    eye_r_x = keypoints.eye["r"][X_coord]
+    eye_r_y = keypoints.eye["r"][Y_coord]
 
-    start_y = min(0,end_y - 2 * (end_y - nose_y))
+    width = int(2 * (distance_between(keypoints.nose, keypoints.eye["l"])))
+    height = int(width * 1.5)
 
+    start_x = nose_x - width
+    start_y = eye_l_y - height
+
+    end_x = nose_x + width
+    end_y = nose_y + height
+
+    print(f"""
+Start X --> {start_x},
+End X --> {end_x},
+Start Y --> {start_y},
+End Y --> {end_y},
+""")
+    
     face_img = img[start_y:end_y, start_x:end_x]
 
     return face_img

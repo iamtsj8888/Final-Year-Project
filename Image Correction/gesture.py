@@ -2,6 +2,7 @@ from ultralytics import YOLO
 import cv2
 import numpy as np
 import math
+import torch
 
 X_coord = 0
 Y_coord = 1
@@ -71,16 +72,30 @@ def extract_face(img, keypoints):
     end_x = nose_x + width
     end_y = nose_y + height
 
-    print(f"""
-Start X --> {start_x},
-End X --> {end_x},
-Start Y --> {start_y},
-End Y --> {end_y},
-""")
+#     print(f"""
+# Start X --> {start_x},
+# End X --> {end_x},
+# Start Y --> {start_y},
+# End Y --> {end_y},
+# """)
     
     face_img = img[start_y:end_y, start_x:end_x]
 
     return face_img
+
+def save_face_img(face_img, key_img):
+    device = torch.device('cuda:0')
+    
+    key_img_tensor = torch.from_numpy(key_img)
+    key_img_tensor = key_img_tensor.to(device)
+
+    face_img_tensor = torch.from_numpy(face_img)
+    face_img_tensor = face_img_tensor.to(device)
+
+    diff = torch.subtract(face_img_tensor, key_img_tensor)
+
+    print(diff)
+
 
 
 if __name__ == "__main__":
@@ -89,6 +104,9 @@ if __name__ == "__main__":
 
     if not cap.isOpened():
         print("Camera Off")
+
+    face_list = []
+    global key_img
 
     while True :
         ret, frame = cap.read()
@@ -99,9 +117,15 @@ if __name__ == "__main__":
         annotated_img, keypoints = extract_points(frame)
 
         points = Points(keypoints=keypoints)
-        points.show_points()
+        # points.show_points()
 
         face_image = extract_face(frame, points)
+        
+        if(len(face_list) == 0):
+            face_list.append(face_image)
+            key_img = face_image
+        else:
+            save_face_img(key_img=key_img, face_img=face_image)
 
         cv2.imshow("Annotated Image", annotated_img)
         cv2.imshow("Face Extraction", face_image)

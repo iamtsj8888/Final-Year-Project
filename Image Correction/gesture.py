@@ -109,21 +109,10 @@ def extract_face(img, keypoints):
         
     return face_img
 
+
 def save_face_img(face_img, key_img, count):
     os.makedirs("face", exist_ok=True)
-    # device = torch.device('cuda:0')
-    
-    # key_img_tensor = torch.from_numpy(key_img)
-    # key_img_tensor = key_img_tensor.to(device)
-
-    # face_img_tensor = torch.from_numpy(face_img)
-    # face_img_tensor = face_img_tensor.to(device)
-
-    # diff = torch.subtract(face_img_tensor, key_img_tensor)
-
     cv2.imwrite(f"face/{count}.png", face_img)
-    # print(diff)
-
 
 
 if __name__ == "__main__":

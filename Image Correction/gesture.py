@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 import math
 import torch
+import os
 
 X_coord = 0
 Y_coord = 1
@@ -37,7 +38,7 @@ def extract_points(img):
 
     top = []
     for r in results:
-        # Only Keypoints of Eyes, Ears, Nose, Shoulders 
+        # Only Keypoints of Eyes, Ears, Nose
         top = np.array(r.keypoints.xy[0][0:5].cpu().numpy())
         break
     
@@ -55,6 +56,11 @@ def distance_between(p1, p2):
 
 
 def extract_face(img, keypoints):
+
+    if(keypoints.eye["l"] == [0,0]):
+        face_img = img[0:0, 0:0]
+        return face_img
+
     nose_y = keypoints.nose[Y_coord]
     nose_x = keypoints.nose[X_coord]
     
@@ -63,44 +69,66 @@ def extract_face(img, keypoints):
     eye_r_x = keypoints.eye["r"][X_coord]
     eye_r_y = keypoints.eye["r"][Y_coord]
 
-    width = int(2 * (distance_between(keypoints.nose, keypoints.eye["l"])))
-    height = int(width * 1.5)
+    if(keypoints.eye["l"] != [0,0]):
+        width = int(2 * (distance_between(keypoints.nose, keypoints.eye["l"])))
+        height = int(width * 1.5)
 
-    start_x = nose_x - width
-    start_y = eye_l_y - height
+        start_x = nose_x - width
+        start_y = eye_l_y - height
 
-    end_x = nose_x + width
-    end_y = nose_y + height
+        end_x = nose_x + width
+        end_y = nose_y + height
 
-#     print(f"""
-# Start X --> {start_x},
-# End X --> {end_x},
-# Start Y --> {start_y},
-# End Y --> {end_y},
-# """)
-    
-    face_img = img[start_y:end_y, start_x:end_x]
+        #     print(f"""
+        # Start X --> {start_x},
+        # End X --> {end_x},
+        # Start Y --> {start_y},
+        # End Y --> {end_y},
+        # """)
 
+        face_img = img[start_y:end_y, start_x:end_x]
+
+    # elif(keypoints.eye["r"] != [0,0]):
+    #     width = int(2 * (distance_between(keypoints.nose, keypoints.eye["r"])))
+    #     height = int(width * 1.5)
+
+    #     start_x = nose_x + width
+    #     start_y = eye_r_y - height
+
+    #     end_x = nose_x - width
+    #     end_y = nose_y + height
+
+    #     #     print(f"""
+    #     # Start X --> {start_x},
+    #     # End X --> {end_x},
+    #     # Start Y --> {start_y},
+    #     # End Y --> {end_y},
+    #     # """)
+        
+    #     face_img = img[start_y:end_y, start_x:end_x]
+        
     return face_img
 
-def save_face_img(face_img, key_img):
-    device = torch.device('cuda:0')
+def save_face_img(face_img, key_img, count):
+    os.makedirs("face", exist_ok=True)
+    # device = torch.device('cuda:0')
     
-    key_img_tensor = torch.from_numpy(key_img)
-    key_img_tensor = key_img_tensor.to(device)
+    # key_img_tensor = torch.from_numpy(key_img)
+    # key_img_tensor = key_img_tensor.to(device)
 
-    face_img_tensor = torch.from_numpy(face_img)
-    face_img_tensor = face_img_tensor.to(device)
+    # face_img_tensor = torch.from_numpy(face_img)
+    # face_img_tensor = face_img_tensor.to(device)
 
-    diff = torch.subtract(face_img_tensor, key_img_tensor)
+    # diff = torch.subtract(face_img_tensor, key_img_tensor)
 
-    print(diff)
+    cv2.imwrite(f"face/{count}.png", face_img)
+    # print(diff)
 
 
 
 if __name__ == "__main__":
 
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture("1.mp4")
 
     if not cap.isOpened():
         print("Camera Off")
@@ -108,6 +136,7 @@ if __name__ == "__main__":
     face_list = []
     global key_img
 
+    count = 1
     while True :
         ret, frame = cap.read()
 
@@ -115,20 +144,24 @@ if __name__ == "__main__":
             break
 
         annotated_img, keypoints = extract_points(frame)
+        
+        if(len(keypoints) < 5): 
+            continue
 
         points = Points(keypoints=keypoints)
-        # points.show_points()
 
         face_image = extract_face(frame, points)
         
-        if(len(face_list) == 0):
-            face_list.append(face_image)
-            key_img = face_image
-        else:
-            save_face_img(key_img=key_img, face_img=face_image)
+        key_img = face_image
 
         cv2.imshow("Annotated Image", annotated_img)
-        cv2.imshow("Face Extraction", face_image)
+        
+        if(face_image.shape != (0,0,3)):
+            print(f"---------------------- {count} ------------------------")
+            points.show_points()
+            cv2.imshow("Face Extraction", face_image)
+            save_face_img(key_img=key_img, face_img=face_image, count= count)
+            count = count + 1
 
         # Check if the user pressed the 'q' key
         if cv2.waitKey(1) == ord('q'):

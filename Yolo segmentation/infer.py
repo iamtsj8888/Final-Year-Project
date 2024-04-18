@@ -18,7 +18,6 @@ def process(results, frame):
     input_tensor = input_tensor.to(device)
 
     mask_img = np.zeros(shape=(384, 640))
-
     mask_tensor = torch.from_numpy(mask_img)
     mask_tensor = mask_tensor.to(device=device)
 

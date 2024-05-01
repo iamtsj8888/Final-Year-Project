@@ -57,7 +57,7 @@ def distance_between(p1, p2):
 
 def extract_face(img, keypoints):
 
-    if(keypoints.eye["l"] == [0,0]):
+    if(keypoints.eye["l"] == [0,0] and keypoints.eye["r"] == [0,0]):
         face_img = img[0:0, 0:0]
         return face_img
 
@@ -88,36 +88,36 @@ def extract_face(img, keypoints):
 
         face_img = img[start_y:end_y, start_x:end_x]
 
-    # elif(keypoints.eye["r"] != [0,0]):
-    #     width = int(2 * (distance_between(keypoints.nose, keypoints.eye["r"])))
-    #     height = int(width * 1.5)
+    elif(keypoints.eye["r"] != [0,0]):
+        width = int(2 * (distance_between(keypoints.nose, keypoints.eye["r"])))
+        height = int(width * 1.5)
 
-    #     start_x = nose_x + width
-    #     start_y = eye_r_y - height
+        start_x = nose_x + width
+        start_y = eye_r_y - height
 
-    #     end_x = nose_x - width
-    #     end_y = nose_y + height
+        end_x = nose_x - width
+        end_y = nose_y + height
 
-    #     #     print(f"""
-    #     # Start X --> {start_x},
-    #     # End X --> {end_x},
-    #     # Start Y --> {start_y},
-    #     # End Y --> {end_y},
-    #     # """)
+        #     print(f"""
+        # Start X --> {start_x},
+        # End X --> {end_x},
+        # Start Y --> {start_y},
+        # End Y --> {end_y},
+        # """)
         
-    #     face_img = img[start_y:end_y, start_x:end_x]
+        face_img = img[start_y:end_y, start_x:end_x]
         
     return face_img
 
 
 def save_face_img(face_img, key_img, count):
-    os.makedirs("face", exist_ok=True)
-    cv2.imwrite(f"face/{count}.png", face_img)
+    os.makedirs("face2", exist_ok=True)
+    cv2.imwrite(f"face2/{count}.png", face_img)
 
 
 if __name__ == "__main__":
 
-    cap = cv2.VideoCapture("1.mp4")
+    cap = cv2.VideoCapture(0)
 
     if not cap.isOpened():
         print("Camera Off")

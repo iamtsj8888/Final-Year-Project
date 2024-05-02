@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 os.environ["TFHUB_DOWNLOAD_PROGRESS"] = "True"
 
 # Declaring Constants
-IMAGE_PATH = "generated_face/upsampled_conv2dTransposed_image.jpg"
+IMAGE_PATH = "face/66.png"
 SAVED_MODEL_PATH = "https://tfhub.dev/captain-pool/esrgan-tf2/1"
 
 def preprocess_image(image_path):

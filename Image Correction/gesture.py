@@ -111,8 +111,8 @@ def extract_face(img, keypoints):
 
 
 def save_face_img(face_img, key_img, count):
-    os.makedirs("face2", exist_ok=True)
-    cv2.imwrite(f"face2/{count}.png", face_img)
+    os.makedirs("face3", exist_ok=True)
+    cv2.imwrite(f"face3/{count}.png", face_img)
 
 
 if __name__ == "__main__":

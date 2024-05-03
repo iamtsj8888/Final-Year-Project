@@ -5,10 +5,10 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_hub as hub
 import matplotlib.pyplot as plt
-os.environ["TFHUB_DOWNLOAD_PROGRESS"] = "True"
+os.environ["TFHUB_DOWNLOAD_PROGRESS"] = "False"
 
 # Declaring Constants
-IMAGE_PATH = "face/66.png"
+IMAGE_PATH = "face1/1.png"
 SAVED_MODEL_PATH = "https://tfhub.dev/captain-pool/esrgan-tf2/1"
 
 def preprocess_image(image_path):

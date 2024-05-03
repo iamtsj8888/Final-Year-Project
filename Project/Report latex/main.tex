@@ -1,0 +1,87 @@
+\documentclass[12pt]{article}
+
+\input{1_header/packages.tex}
+
+\begin{document}
+\restoregeometry
+
+\setcounter{tocdepth}{5}
+
+\input{1_header/firstpage.tex}
+\pagebreak
+
+\input{1_header/secondpage.tex}
+\pagebreak
+
+\input{1_header/thirdpage.tex}
+\pagebreak
+
+\input{1_header/fourthpage.tex}
+\pagebreak
+
+\input{1_header/fifthpage.tex}
+\pagebreak
+
+\tableofcontents
+\pagebreak
+
+\listoffigures
+\pagebreak
+
+\justify
+\section*{\textlarger[2]{Abstract}}
+\input{1_header/abstract.tex}
+\pagebreak
+
+\section{\textlarger[2]{Introduction}}
+\input{1_header/introduction.tex}
+\pagebreak
+
+\section{\textlarger[2]{Literature Review}}
+\input{2_body/literature.tex}
+\pagebreak
+
+\section{\textlarger[1.5]{Methodology}}
+\input{2_body/methods.tex}
+\pagebreak
+
+% \section{\textlarger[1.5]{Implementation results}}
+\input{2_body/implementation.tex}
+\pagebreak
+
+\section{\textlarger[1.5]{Results and discussion}}
+\input{2_body/results.tex}
+\pagebreak
+
+\section{\textlarger[1.5]{Conclusions}}
+\input{2_body/conclusions.tex}
+\pagebreak
+
+\section{\textlarger[1.5]{Future Scope}}
+\input{2_body/futuregoals.tex}
+\pagebreak
+
+\section{\textlarger[1.5]{References}}
+\printbibliography[heading=none]
+\begin{thebibliography}{9}
+
+\bibitem{Yolov8:2024:PoseEstimation}
+Ultralytics. (n.d.). Pose Estimation. Retrieved from <https://docs.ultralytics.com/tasks/pose/>
+
+\bibitem{Ultralytics:2024:PoseDatasets}
+Ultralytics. (n.d.). Pose Datasets Overview. Retrieved from <https://docs.ultralytics.com/datasets/pose/>
+
+\bibitem{TensorFlowHub:2024:ESRGAN}
+TensorFlow Hub. (n.d.). Image Super Resolution using ESRGAN TensorFlow Hub. Retrieved from https://www.tensorflow.org/hub/tutorials/image enhancing
+
+\bibitem{ESRGAN:2024:NetworkArchitecture}
+ESRGAN. (n.d.). Network Architecture. Retrieved from https://esrgan.readthedocs.io/en/latest/pages/esrgan.html - network-architecture
+
+\bibitem{TensorFlowHub:2023:ESRGAN}
+TensorFlow Hub. (n.d.). ESRGAN. TensorFlow Hub. Retrieved from https://tfhub.dev/tensorflow/esrgan x4/1
+
+\bibitem{Zhang:2020:ISR:3373121.3373134}
+Zhang, Y., Liu, X., and Wang, Z., 2020, Image Super-Resolution using Enhanced Super-Resolution Generative Adversarial Networks, arXiv preprint arXiv:2004.05983.
+\end{thebibliography}
+
+\end{document}

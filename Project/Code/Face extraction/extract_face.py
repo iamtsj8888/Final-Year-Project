@@ -156,6 +156,15 @@ def save_face_img(face_img, frame_img, annotated_img, nth_dir, count):
     cv2.imwrite(f"Result{nth_dir}/frame/{count}.png", frame_img)
     cv2.imwrite(f"Result{nth_dir}/annotated_frame/{count}.png", annotated_img)
 
+def result_dir():
+    """
+        Determines the result output folder 
+    """
+    nth_dir = 1
+    while(os.path.exists(f"Result{nth_dir}")):
+        nth_dir = nth_dir + 1
+    
+    return nth_dir
 
 def process(path):
     """ 
@@ -165,6 +174,8 @@ def process(path):
     """
 
     cap = cv2.VideoCapture(path)
+
+    nth_dir = result_dir()
 
     if not cap.isOpened():
         print("Camera Off")
@@ -196,7 +207,7 @@ def process(path):
             print(f"---------------------- {count} ------------------------")
             points.show_points()
             cv2.imshow("Face Extraction", face_image)
-            save_face_img(frame_img=frame,annotated_img=annotated_img, face_img=face_image, count= count)
+            save_face_img(frame_img=frame,annotated_img=annotated_img, face_img=face_image, count= count, nth_dir=nth_dir)
             count = count + 1
 
         # Check if the user pressed the 'q' key
@@ -206,19 +217,12 @@ def process(path):
     cap.release()
     cv2.destroyAllWindows()
 
-def result_dir():
-    nth_dir = 1
-    while(os.path.exists(f"Result{nth_dir}")):
-        nth_dir = nth_dir + 1
-    
-    return nth_dir
+
 
 if __name__ == "__main__":
 
     # Path to the Video or 0 for webcam
     path = "../1.mp4"
-
-    print(result_dir())
 
     # process(path=0)
     

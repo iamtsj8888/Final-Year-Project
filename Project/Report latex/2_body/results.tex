@@ -1,0 +1,39 @@
+\subsection{Dataset and Evaluation Setup}
+
+The proposed face extraction and enhancement pipeline was evaluated on a real-life scenario involving a laptop theft incident captured by a closed-circuit television (CCTV) camera. The video footage obtained from the CCTV system served as the primary dataset for testing and evaluating the effectiveness of the developed approach.
+
+\begin{enumerate}
+    \item \textbf{Dataset Characteristics}: 
+
+\begin{itemize}
+        \item The CCTV footage was a low-quality video, typical of routine surveillance camera systems with limited specifications.
+        \item No additional dataset preparation or splitting was required, as the goal was to assess the pipeline's performance on a real-world use case.
+        \item The video captured the incident under practical lighting conditions and environment, presenting challenges such as low resolution, motion blur, and potential occlusions.
+\end{itemize}
+
+    \item \textbf{Model Setup}: 
+
+\begin{itemize}
+        \item The YOLOv8 pose estimation model and the ESRGAN super-resolution model were employed in their pre-trained state, leveraging their robust capabilities and state-of-the-art performance.
+        \item No additional training or fine-tuning was performed on these models, as they were designed to generalize well to diverse scenarios.
+\end{itemize}
+
+\end{enumerate}
+
+\subsection{Face Extraction Performance}
+
+The YOLOv8 pose estimation model demonstrated remarkable accuracy in facial keypoint detection, even when using the lightweight nano variant. Despite the low-resolution nature of the CCTV footage, the model successfully localized facial keypoints, enabling the precise extraction of face bounding boxes from the video frames.
+
+The success rate of face bounding box extraction was satisfactory, allowing the pipeline to reliably capture and extract face images from most of the video frames. Even in challenging conditions with low-resolution inputs, the model's performance remained robust, highlighting its effectiveness in real-world surveillance scenarios.
+
+\subsection{Discussion}
+
+The proposed pipeline demonstrated promising results in extracting and enhancing face bounding boxes from challenging CCTV footage. The combination of YOLOv8 for keypoint detection and subsequent bounding box extraction allowed for accurate face localization, even in low-resolution environments. However, the enhancement techniques, including conventional upsampling methods and the ESRGAN model, exhibited limitations when dealing with extremely small or degraded face images.
+
+A key limitation of the current pipeline is its reliance on reasonably good quality video feeds. While it performed well on the CCTV footage, it may face challenges with severely degraded or low-resolution videos, where face bounding boxes lack sufficient detail for effective enhancement.
+
+Despite these limitations, the pipeline holds practical implications in surveillance systems, forensic investigations, and law enforcement. By enhancing the visual quality and resolution of face images, it can potentially improve the accuracy and reliability of subsequent face recognition tasks, aiding in the identification of individuals of interest.
+
+The modular nature of the pipeline allows for the integration of alternative or improved techniques as new advancements emerge. Future work could explore advanced face extraction methods, specialized super-resolution models for surveillance applications, or additional preprocessing/post-processing steps to address real-world challenges.
+
+Overall, the proposed pipeline leverages state-of-the-art deep learning models and computer vision techniques to tackle the problem of face extraction and enhancement from low-quality video sources. While exhibiting limitations, it serves as a foundation for further research and development, contributing to improved public safety and security measures through enhanced face recognition capabilities.

@@ -46,8 +46,8 @@ def extract_points(img):
             image : Frame read from the video capture
     """
 
-    # Load model from a path
-    model = YOLO('Model/yolov8n-pose.pt')  
+    # Load model from a path 
+    model = YOLO('Project/Code/Face extraction/Model/yolov8n-pose.pt')  
 
     # Predict with the model
     results = model(img)
@@ -124,10 +124,10 @@ def extract_face(img, keypoints):
         width = int(2 * (distance_between(keypoints.nose, keypoints.eye["r"])))
         height = int(width * 1.5)
 
-        start_x = nose_x + width
+        start_x = nose_x - width
         start_y = eye_r_y - height
 
-        end_x = nose_x - width
+        end_x = nose_x + width
         end_y = nose_y + height
 
         #     print(f"""
@@ -141,20 +141,20 @@ def extract_face(img, keypoints):
         
     return face_img
 
-def save_face_img(face_img, frame_img, annotated_img ,count):
+def save_face_img(face_img, frame_img, annotated_img, nth_dir, count):
     """ 
         Saves the face image, original image, annotated image, count of the current image
         Args:
             face image, original image, annotated image, count of the current image
     """
 
-    nth_dir = 1
-    os.makedirs(f"face{nth_dir}", exist_ok=True)
-    os.makedirs(f"frame{nth_dir}", exist_ok=True)
-    os.makedirs(f"annotated_frame{nth_dir}", exist_ok=True)
-    cv2.imwrite(f"face{nth_dir}/{count}.png", face_img)
-    cv2.imwrite(f"frame{nth_dir}/{count}.png", frame_img)
-    cv2.imwrite(f"annotated_frame{nth_dir}/{count}.png", annotated_img)
+
+    os.makedirs(f"Result{nth_dir}/face", exist_ok=True)
+    os.makedirs(f"Result{nth_dir}/frame", exist_ok=True)
+    os.makedirs(f"Result{nth_dir}/annotated_frame", exist_ok=True)
+    cv2.imwrite(f"Result{nth_dir}/face/{count}.png", face_img)
+    cv2.imwrite(f"Result{nth_dir}/frame/{count}.png", frame_img)
+    cv2.imwrite(f"Result{nth_dir}/annotated_frame/{count}.png", annotated_img)
 
 
 def process(path):
@@ -206,11 +206,19 @@ def process(path):
     cap.release()
     cv2.destroyAllWindows()
 
+def result_dir():
+    nth_dir = 1
+    while(os.path.exists(f"Result{nth_dir}")):
+        nth_dir = nth_dir + 1
+    
+    return nth_dir
 
 if __name__ == "__main__":
 
     # Path to the Video or 0 for webcam
     path = "../1.mp4"
 
-    process(path=path)
+    print(result_dir())
+
+    # process(path=0)
     
